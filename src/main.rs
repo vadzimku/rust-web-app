@@ -1,44 +1,13 @@
-use axum::{
-    http::StatusCode,
-    routing::{get, post},
-    Json, Router,
-};
-use serde::{Deserialize, Serialize};
-
 #[tokio::main]
 async fn main() {
-    // initialize tracing
-    tracing_subscriber::fmt::init();
+    let app = rust_web_app::build_router();
 
-    // build our application with a route
-    let app = Router::new()
-        .route("/", get(root))
-        .route("/users", post(create_user));
-
-    let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();
-    axum::serve(listener, app).await.unwrap();
-}
-
-async fn root() -> &'static str {
-    "Hello, Rust!"
-}
-
-async fn create_user(Json(payload): Json<CreateUser>) -> (StatusCode, Json<User>) {
-    let user = User {
-        id: 42,
-        username: payload.username,
-    };
-
-    (StatusCode::CREATED, Json(user))
-}
-
-#[derive(Deserialize)]
-struct CreateUser {
-    username: String,
-}
-
-#[derive(Serialize)]
-struct User {
-    id: u64,
-    username: String,
+    let _ = tokio::net::TcpListener::bind("0.0.0.0:3000")
+        .await
+        .map_or_else(
+            |err| panic!("Error while creating tcp listener: {}", err),
+            |listener| axum::serve(listener, app),
+        )
+        .await
+        .map_err(|err| panic!("Error while starting web app: {}", err));
 }
