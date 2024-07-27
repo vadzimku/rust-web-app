@@ -21,3 +21,30 @@ impl UserService {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_create_user() {
+        let subject = UserService::build();
+
+        let test_user_name = "test_user_name";
+        let result = subject.create_user(test_user_name.to_string());
+
+        assert_eq!(result.id, 42);
+        assert_eq!(result.username, test_user_name);
+    }
+
+    #[test]
+    fn test_get_user() {
+        let subject = UserService::build();
+
+        let test_user_id = 12u64;
+        let result = subject.get_user(test_user_id);
+
+        assert_eq!(result.id, test_user_id);
+        assert_eq!(result.username, format!("test_user_{test_user_id}"))
+    }
+}
