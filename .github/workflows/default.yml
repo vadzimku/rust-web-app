@@ -34,4 +34,8 @@ jobs:
       - name: checkout
         uses: actions/checkout@v4
       - name: docker build
-        run: docker build -f ./docker/Dockerfile .
+        run: docker build -t rust-web-app -f ./docker/Dockerfile .
+      - name: docker run container
+        run: docker run -p 8080:3000 --rm --name rust-web-app rust-web-app
+      - name: health check
+        run: curl http://localhost:8000/health

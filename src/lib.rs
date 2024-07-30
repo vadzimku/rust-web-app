@@ -15,12 +15,17 @@ pub fn build_router() -> Router {
 
     Router::new()
         .route("/", get(root))
+        .route("/health", get(health))
         .route("/users/:id", get(move |p| get_user(p, us_builder())))
         .route("/users", post(move |p| create_user(p, us_builder())))
 }
 
 async fn root() -> &'static str {
     "Hello, Rust!"
+}
+
+async fn health() -> (StatusCode, String) {
+    (StatusCode::OK, String::from("up"))
 }
 
 async fn get_user(Path(id): Path<u64>, service: UserService) -> impl IntoResponse {
