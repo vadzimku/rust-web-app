@@ -38,7 +38,7 @@ jobs:
       - name: docker run container
         run: docker run -p 8080:3000 -d --name rust-web-app rust-web-app
       - name: health check
-        run: curl http://localhost:8080/health1 --fail-with-body
+        run: curl http://localhost:8080/health --fail-with-body
       - name: docker stop container
         run: docker stop rust-web-app
       - name: docker remove container
