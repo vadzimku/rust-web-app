@@ -36,6 +36,10 @@ jobs:
       - name: docker build
         run: docker build -t rust-web-app -f ./docker/Dockerfile .
       - name: docker run container
-        run: docker run -p 8080:3000 --rm --name rust-web-app rust-web-app
+        run: docker run -p 8080:3000 -d --name rust-web-app rust-web-app
       - name: health check
-        run: curl http://localhost:8000/health
+        run: if [ $(curl -LI http://localhost:8080/health1 -o /dev/null -w '%{http_code}\n' -s) == "200" ]; then echo 0; else echo 1; fi
+      - name: docker stop container
+        run: docker stop rust-web-app
+      - name: docker remove container
+        run: docker rm rust-web-app
