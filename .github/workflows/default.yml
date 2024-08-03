@@ -1,16 +1,42 @@
 name: default
 
-on: [push, pull_request]
+on: 
+  push:
+  pull_request:
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build_and_test:
+    name: build&test
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        toolchain:
+          - stable
+          - beta
+          - nightly
     steps:
-    - uses: actions/checkout@v4
-    - name: Build
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: setup toolchain
+      run: rustup update ${{ matrix.toolchain }} && rustup default ${{ matrix.toolchain }}
+    - name: build
       run: cargo build --verbose
-    - name: Run tests
+    - name: test
       run: cargo test --verbose
+
+  build_docker_image:
+    name: docker build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+      - name: docker build&check
+        run: |
+          docker build -t rust-web-app -f ./docker/Dockerfile .
+          docker run -p 8080:3000 -d --name rust-web-app rust-web-app
+          curl http://localhost:8080/health --fail-with-body
+          docker stop rust-web-app
+          docker rm rust-web-app
