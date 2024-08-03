@@ -16,7 +16,7 @@ RUN cargo build --release
 
 
 FROM debian:bullseye-slim
-ARG APP=/usr/src/app
+ARG APP=/usr/src/app  
 
 RUN apt-get update \
     && apt-get install -y ca-certificates tzdata \
@@ -37,6 +37,7 @@ COPY --from=builder /${APP_NAME}/target/release/${APP_NAME} ${APP}/${APP_NAME}
 RUN chown -R $APP_USER:$APP_USER ${APP}
 
 USER $APP_USER
+
 WORKDIR ${APP}
 
-CMD ["./rust-web-app"]
+CMD ["sh", "-c", "./${APP_NAME}"]

@@ -33,13 +33,10 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v4
-      - name: docker build
-        run: docker build -t rust-web-app -f ./docker/Dockerfile .
-      - name: docker run container
-        run: docker run -p 8080:3000 -d --name rust-web-app rust-web-app
-      - name: health check
-        run: curl http://localhost:8080/health --fail-with-body
-      - name: docker stop container
-        run: docker stop rust-web-app
-      - name: docker remove container
-        run: docker rm rust-web-app
+      - name: docker build&check
+        run: |
+          docker build -t rust-web-app -f ./docker/Dockerfile .
+          docker run -p 8080:3000 -d --name rust-web-app rust-web-app
+          curl http://localhost:8080/health --fail-with-body
+          docker stop rust-web-app
+          docker rm rust-web-app
